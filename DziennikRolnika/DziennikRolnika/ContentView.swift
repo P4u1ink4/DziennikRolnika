@@ -8,12 +8,17 @@
 import SwiftUI
 
 struct ContentView: View {
+    
     var body: some View {
         NavigationView {
             VStack(alignment: .center) {
                 Text(currentDateFormatted())
                     .font(.title)
-                Image("sunny")
+                HStack(){
+                    Image("Clear")
+                    Text("Słonecznie")
+                    // BŁĄD W POBIERANIU POGODY
+                }
                 VStack {
                     Text("NAJBLIŻSZE NA POLU:")
                         .font(.subheadline)
@@ -89,29 +94,5 @@ struct ContentView_Previews: PreviewProvider {
         Group {
             ContentView()
         }
-    }
-}
-
-struct YearCalender: View {
-    var body: some View {
-        VStack {
-        }
-        .navigationTitle("Kalendarz roczny")
-    }
-}
-
-struct Cows: View {
-    var body: some View {
-        VStack {
-        }
-        .navigationTitle("Spis krów")
-    }
-}
-
-struct Fields: View {
-    var body: some View {
-        VStack {
-        }
-        .navigationTitle("Spis pól")
     }
 }
