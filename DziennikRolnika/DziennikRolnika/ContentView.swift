@@ -8,56 +8,120 @@
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject var viewModel = TaskViewModel()
+    @State private var showAddTaskSheet = false
+    @State private var isDeleting = false
+    @State private var deleteWorkItem: DispatchWorkItem?
+    @State private var taskToDeleteIndex: Int?
+    @State private var offset: CGSize = .zero
+    @State private var weatherDescription: String = "Loading..."
+    
+    private func startDeleting(at index: Int) {
+            isDeleting = true
+            taskToDeleteIndex = index
+            deleteWorkItem = DispatchWorkItem {
+                endDeleting()
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5, execute: deleteWorkItem!)
+        }
+
+    private func endDeleting() {
+            isDeleting = false
+            taskToDeleteIndex = nil
+            deleteWorkItem?.cancel()
+            deleteWorkItem = nil
+    }
+    
+    private func getWeatherForPoznan() {
+            guard let url = URL(string: "https://api.weatherapi.com/v1/current.json?key=d0135269911a4872854214646233107&q=Poznan") else {
+                print("Nieprawidłowy adres URL")
+                return
+            }
+
+            URLSession.shared.dataTask(with: url) { data, response, error in
+                if let data = data {
+                    do {
+                        let decoder = JSONDecoder()
+                        let weatherResponse = try decoder.decode(WeatherData.self, from: data)
+                        DispatchQueue.main.async {
+                            weatherDescription = weatherResponse.current.condition.text
+                        }
+                    } catch {
+                        print("Błąd dekodowania danych: \(error)")
+                    }
+                }
+            }.resume()
+    }
     
     var body: some View {
         NavigationView {
             VStack(alignment: .center) {
                 Text(currentDateFormatted())
                     .font(.title)
-                HStack(){
-                    Image("Clear")
-                    Text("Słonecznie")
-                    // BŁĄD W POBIERANIU POGODY
-                }
-                VStack {
-                    Text("NAJBLIŻSZE NA POLU:")
-                        .font(.subheadline)
-                        .frame(width: 200.0)
-                    Text("- nie wiem jeszcze")
-                        .font(.footnote)
+                HStack{
+                    Image("\(weatherDescription)")
+                    Text("\(weatherDescription)")
                         .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
-                        .frame(width: 200.0)
-                    Spacer()
-                        .frame(height: 20.0)
-                    Text("OPCJONALNE WYMAGANIA:")
-                        .font(.subheadline)
-                        .frame(width: 200.0)
-                    Text("- nie wiem jeszcze np. pogoda")
-                        .font(.footnote)
-                        .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
-                        .frame(width: 200.0)
+                                
+                    Button("Odśwież") {
+                        getWeatherForPoznan()
                     }
-                    .padding()
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(Color(hue: 1.0, saturation: 0.013, brightness: 0.304), lineWidth: 2)
-                    )
+                    .padding(5.0)
+                    .foregroundColor(.gray)
+                }
                 Spacer()
                     .frame(height: 20.0)
                 VStack {
-                    Text("DO ZROBIENIA:")
-                        .font(.subheadline)
-                        .frame(width: 200.0)
-                    Text(" - zrobić to do list")
-                        .frame(width: 200.0)
-                        .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
-                        .font(.footnote)
+                    HStack{
+                        Text("DO ZROBIENIA:")
+                            .font(.subheadline)
+                            .frame(width: 200.0)
+                        Button("+") { showAddTaskSheet.toggle() }
                     }
-                    .padding()
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 5)
-                            .stroke(Color(hue: 1.0, saturation: 0.013, brightness: 0.304), lineWidth: 2)
-                    )
+                    ScrollView{
+                        VStack(spacing: 10) {
+                            ForEach(viewModel.tasks.indices, id: \.self) { index in
+                                let task = viewModel.tasks[index]
+                                Text(task)
+                                    .frame(width: 200.0)
+                                    .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
+                                    .font(.footnote)
+                                    .offset(x: isDeleting && taskToDeleteIndex == index ? offset.width : 0, y: 0)
+                                    .gesture(
+                                        DragGesture()
+                                            .onChanged { value in
+                                                if !isDeleting {
+                                                    startDeleting(at: index)
+                                                }
+                                                offset = value.translation
+                                                if value.translation.width > 0 { offset = .zero }
+                                            }
+                                            .onEnded { value in
+                                                endDeleting()
+                                                offset = .zero
+                                                if value.translation.width < -100 {
+                                                    let indexSet = IndexSet([index])
+                                                    viewModel.removeTask(at: indexSet)
+                                                }
+                                            }
+                                    )
+                            }
+                        }
+                    }
+                    .frame(height: 100.0)
+                }
+                .padding()
+                .overlay(
+                    RoundedRectangle(cornerRadius: 5)
+                        .stroke(Color(hue: 1.0, saturation: 0.013, brightness: 0.304), lineWidth: 2)
+                )
+                .sheet(isPresented: $showAddTaskSheet, content: {
+                            AddTaskView(onAddTask: { title in
+                                viewModel.addTask(title: title)
+                                showAddTaskSheet = false
+                            })
+                        })
+                
                 Spacer()
                     .frame(height: 20.0)
                 VStack(alignment: .center, spacing: 15.0){
@@ -79,6 +143,40 @@ struct ContentView: View {
                     .frame(height: 100.0)
 
             }
+        }
+    }
+}
+
+class TaskViewModel: ObservableObject {
+    @Published var tasks: [String] = []
+
+    func addTask(title: String) {
+        tasks.append(title)
+    }
+
+    func removeTask(at index: IndexSet) {
+        tasks.remove(atOffsets: index)
+    }
+
+}
+
+struct AddTaskView: View {
+    @State private var taskTitle = ""
+    var onAddTask: (String) -> Void
+
+    var body: some View {
+        VStack {
+            TextField("Nowe zadanie", text: $taskTitle)
+                .textFieldStyle(RoundedBorderTextFieldStyle())
+                .padding()
+
+            Button("Dodaj zadanie") {
+                onAddTask(taskTitle)
+            }
+            .padding()
+            .accentColor(.blue)
+
+            Spacer()
         }
     }
 }
