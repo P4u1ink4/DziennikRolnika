@@ -1,4 +1,3 @@
-//
 //  Fields.swift
 //  DziennikRolnika
 //
@@ -9,7 +8,7 @@ import SwiftUI
 import MapKit
 
 struct Fields: View {
-    @State private var fields: [Field] = []
+    @ObservedObject var viewModel = FieldViewModel()
     @State private var selectedCategoryFilters: Set<String> = []
     @State private var selectedField: Field?
     @State private var showAddFieldSheet = false
@@ -19,9 +18,9 @@ struct Fields: View {
     
     var filteredFields: [Field] {
         if selectedCategoryFilters.isEmpty {
-            return fields
+            return viewModel.fields
         } else {
-            return fields.filter { selectedCategoryFilters.contains($0.category) }
+            return viewModel.fields.filter { selectedCategoryFilters.contains($0.category) }
         }
     }
     
@@ -50,12 +49,11 @@ struct Fields: View {
             )
             .sheet(isPresented: $showAddFieldSheet, content: {
                 AddFieldView(allCategories: $allCategories, onAddField: { newField in
-                    fields.append(newField)
+                    viewModel.fields.append(newField)
                     allCategories.insert(newField.category) // Dodaj nową kategorię do allCategories
                 })
             })
         }
-        .navigationBarTitle(Text(""), displayMode: .inline)
         .onAppear {
             updateAllCategories() // Aktualizuj allCategories na podstawie dostępnych kategorii
         }
@@ -63,11 +61,15 @@ struct Fields: View {
     
     private func updateAllCategories() {
         var categories = Set<String>()
-        for field in fields {
+        for field in viewModel.fields {
             categories.insert(field.category)
         }
         allCategories = categories
     }
+}
+
+class FieldViewModel: ObservableObject {
+    @Published var fields: [Field] = []
 }
 
 struct MapView: View {
@@ -168,9 +170,6 @@ struct CategoryFilterSheet: View {
         }
     }
 }
-
-
-
 
 struct Field: Identifiable {
     let id = UUID()
