@@ -15,6 +15,7 @@
 		C27A8F6E2A78314400F1FD3F /* Fields.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F6D2A78314400F1FD3F /* Fields.swift */; };
 		C27A8F702A78314F00F1FD3F /* YearCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F6F2A78314F00F1FD3F /* YearCalender.swift */; };
 		C27A8F7A2A785F5100F1FD3F /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F792A785F5100F1FD3F /* WeatherService.swift */; };
+		C27A8F7E2A7E777600F1FD3F /* SpecialDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F7D2A7E777600F1FD3F /* SpecialDays.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,6 +28,7 @@
 		C27A8F6D2A78314400F1FD3F /* Fields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fields.swift; sourceTree = "<group>"; };
 		C27A8F6F2A78314F00F1FD3F /* YearCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearCalender.swift; sourceTree = "<group>"; };
 		C27A8F792A785F5100F1FD3F /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
+		C27A8F7D2A7E777600F1FD3F /* SpecialDays.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpecialDays.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				C27A8F6D2A78314400F1FD3F /* Fields.swift */,
 				C27A8F6F2A78314F00F1FD3F /* YearCalender.swift */,
 				C27A8F792A785F5100F1FD3F /* WeatherService.swift */,
+				C27A8F7D2A7E777600F1FD3F /* SpecialDays.swift */,
 			);
 			path = DziennikRolnika;
 			sourceTree = "<group>";
@@ -152,6 +155,7 @@
 				C27A8F602A780A0F00F1FD3F /* ContentView.swift in Sources */,
 				C27A8F702A78314F00F1FD3F /* YearCalender.swift in Sources */,
 				C27A8F5E2A780A0F00F1FD3F /* DziennikRolnikaApp.swift in Sources */,
+				C27A8F7E2A7E777600F1FD3F /* SpecialDays.swift in Sources */,
 				C27A8F6E2A78314400F1FD3F /* Fields.swift in Sources */,
 				C27A8F7A2A785F5100F1FD3F /* WeatherService.swift in Sources */,
 				C27A8F6C2A78312E00F1FD3F /* Cows.swift in Sources */,
