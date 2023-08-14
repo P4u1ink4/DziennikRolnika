@@ -9,12 +9,15 @@ import MapKit
 
 struct Fields: View {
     @ObservedObject var viewModel = FieldViewModel()
+    @ObservedObject private var colorPickerManager = ColorPickerManager()
+    
     @State private var selectedCategoryFilters: Set<String> = []
     @State private var selectedField: Field?
     @State private var showAddFieldSheet = false
     @State private var isCategoryFilterSheetPresented = false
     @State private var isFilterApplied = false
     @State private var allCategories: Set<String> = [] // Nowa zmienna
+    
     
     var filteredFields: [Field] {
         if selectedCategoryFilters.isEmpty {
@@ -36,9 +39,13 @@ struct Fields: View {
                     CategoryFilterSheet(selectedCategoryFilters: $selectedCategoryFilters, allCategories: allCategories, isFilterApplied: $isFilterApplied, isCategoryFilterSheetPresented: $isCategoryFilterSheetPresented)
                 })
 
-                MapView(fields: filteredFields, selectedField: $selectedField, selectedCategoryFilters: selectedCategoryFilters)
-                    .frame(height: 300)
-                
+                MapView(fields: filteredFields, selectedField: $selectedField, selectedCategoryFilters: selectedCategoryFilters, color: colorPickerManager.selectedColor)
+                    .frame(height: 500)
+            
+                VStack {
+                    ColorPicker("", selection: $colorPickerManager.selectedColor)
+                }
+                .frame(maxWidth: 50, maxHeight: 50)
             }
             .navigationBarItems(trailing:
                 Button(action: {
@@ -68,6 +75,10 @@ struct Fields: View {
     }
 }
 
+class ColorPickerManager: ObservableObject {
+    @Published var selectedColor: Color = .white
+}
+
 class FieldViewModel: ObservableObject {
     @Published var fields: [Field] = []
 }
@@ -76,6 +87,7 @@ struct MapView: View {
     var fields: [Field]
     @Binding var selectedField: Field?
     var selectedCategoryFilters: Set<String>
+    var color: Color
     
     @State private var isShowingDetails = false
     
@@ -87,7 +99,7 @@ struct MapView: View {
                     isShowingDetails.toggle()
                 }) {
                     Circle()
-                        .fill(Color.blue)
+                        .fill(color)
                         .frame(width: 20, height: 20)
                 }
             }
@@ -96,7 +108,7 @@ struct MapView: View {
             selectedField = nil
             isShowingDetails = false
         }
-        .frame(height: 300)
+        .frame(height: 500)
         .sheet(isPresented: $isShowingDetails) {
             if let selectedField = selectedField {
                 FieldDetailsView(field: selectedField)
@@ -124,7 +136,7 @@ struct FieldDetailsView: View {
     
     var body: some View {
         VStack {
-            Text("Kategoria: \(field.category)")
+            Text("\(field.category)")
             TextEditor(text: .constant(field.history))
                 .disabled(true)
                 .padding()
@@ -178,10 +190,13 @@ struct Field: Identifiable {
     var history: String
 }
 
-
 struct AddFieldView: View {
     @Environment(\.presentationMode) var presentationMode
-    @State private var location: CLLocationCoordinate2D = CLLocationCoordinate2D(latitude: 52.4064, longitude: 16.9252)
+    @State private var mapRegion = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 52.4064, longitude: 16.9252),
+        span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
+    )
+    
     @State private var category: String = ""
     @State private var history: String = ""
     @Binding var allCategories: Set<String>
@@ -190,10 +205,10 @@ struct AddFieldView: View {
     
     var body: some View {
         VStack {
-            Map(coordinateRegion: regionForCoordinatesBinding(), showsUserLocation: true, annotationItems: [Field(location: location, category: category, history: history)]) { field in
+            Map(coordinateRegion: $mapRegion, showsUserLocation: true, annotationItems: [Field(location: mapRegion.center, category: category, history: history)]) { field in
                 MapPin(coordinate: field.location, tint: .red)
             }
-            .frame(height: 200)
+            .frame(height: 400)
             
             TextField("Kategoria", text: $category)
                 .padding()
@@ -202,13 +217,13 @@ struct AddFieldView: View {
                 .frame(height: 100)
                 .padding()
                 .overlay(RoundedRectangle(cornerRadius: 0).stroke(Color.gray, lineWidth: 1))
-
+            
             Button("Dodaj pole") {
                 if !allCategories.contains(category) {
                     allCategories.insert(category) // Dodaj nową kategorię do allCategories
                 }
-                                
-                let newField = Field(location: location, category: category, history: history)
+                
+                let newField = Field(location: mapRegion.center, category: category, history: history)
                 onAddField(newField)
                 presentationMode.wrappedValue.dismiss()
             }
@@ -218,19 +233,7 @@ struct AddFieldView: View {
             .cornerRadius(10)
         }
     }
-    
-    private func regionForCoordinatesBinding() -> Binding<MKCoordinateRegion> {
-        Binding<MKCoordinateRegion>(
-            get: {
-                return MKCoordinateRegion(center: location, span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05))
-            },
-            set: { newValue in
-                location = newValue.center
-            }
-        )
-    }
 }
-
 
 
 struct Fields_Previews: PreviewProvider {

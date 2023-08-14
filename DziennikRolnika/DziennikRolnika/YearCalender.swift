@@ -6,7 +6,7 @@
 //
 
 import SwiftUI
-
+import Foundation
 
 struct YearCalender: View {
     @State private var selectedYear = Calendar.current.component(.year, from: Date())
@@ -64,11 +64,21 @@ struct MonthView: View {
                 .padding(.vertical, 10)
             
             LazyVGrid(columns: Array(repeating: .init(.flexible()), count: 7), spacing: 10) {
+                Text("pon")
+                Text("wt")
+                Text("śr")
+                Text("czw")
+                Text("pt")
+                Text("sob")
+                    .foregroundColor(.red)
+                Text("nd")
+                    .foregroundColor(.red)
                 ForEach(getDaysOfMonth(year: year, month: month), id: \.self) { day in
+                    let backgroundColor = getBackgroundColor(month: month, day: Int(day) ?? 0)
                     Text("\(day)")
                         .frame(width: 30, height: 30)
-                        .foregroundColor(.black)
-                        .background(getBackgroundColor(year: String(year), month: String(month), day: String(day)))
+                        .foregroundColor(Color("MyColor"))
+                        .background(backgroundColor)
                         .cornerRadius(15)
                 }
             }
@@ -77,13 +87,19 @@ struct MonthView: View {
         .border(Color.gray, width: 1)
     }
     
-func getDaysOfMonth(year: Int, month: Int) -> [String] {
+    func getDaysOfMonth(year: Int, month: Int) -> [String] {
         var days: [String] = []
         
         let firstDay = Calendar.current.date(from: DateComponents(year: year, month: month, day: 1))!
         let weekday = Calendar.current.component(.weekday, from: firstDay)
-        let emptyDays = Array(repeating: "", count: weekday - 1)
-        days.append(contentsOf: emptyDays)
+        if(weekday == 1){
+            let emptyDays = Array(repeating: "", count: 6)
+            days.append(contentsOf: emptyDays)
+        }
+        else{
+            let emptyDays = Array(repeating: "", count: weekday - 2)
+            days.append(contentsOf: emptyDays)
+        }
         
         let range = Calendar.current.range(of: .day, in: .month, for: firstDay)!
         days.append(contentsOf: range.map { String($0) })
@@ -92,22 +108,13 @@ func getDaysOfMonth(year: Int, month: Int) -> [String] {
     }
 }
 
-func getBackgroundColor(year: String, month: String, day: String) -> Color {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let dateString = "\(year)-\(month)-\(day)"
-        
-        if let date = dateFormatter.date(from: dateString) {
-            for specialDay in specialDays {
-                let specialDate = Calendar.current.date(from: DateComponents(year: specialDay.year, month: specialDay.month, day: specialDay.day))!
-                if Calendar.current.isDate(date, inSameDayAs: specialDate) {
-                    return specialDay.color
-                }
-            }
-        }
-        
+func getBackgroundColor(month: Int, day: Int) -> Color {
+    if let specialDay = specialDays.first(where: { $0.month == month && $0.day == day }) {
+        return specialDay.color
+    } else {
         return Color.clear
     }
+}
 
 
 
@@ -116,19 +123,73 @@ struct LegendView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("LEGEND")
+            Text("LEGENDA")
                 .font(.headline)
             HStack(spacing: 10) {
                 Circle()
                     .frame(width: 20, height: 20)
-                    .foregroundColor(Color.blue)
-                Text("Days in the month")
+                    .foregroundColor(Color(hue: 0.115, saturation: 0.745, brightness: 0.653))
+                Text("Nawożenie pól, łąk obornikiem, kompostem")
             }
             HStack(spacing: 10) {
                 Circle()
                     .frame(width: 20, height: 20)
-                    .foregroundColor(Color.gray)
-                Text("Other days")
+                    .foregroundColor(Color(hue: 0.144, saturation: 0.962, brightness: 0.893))
+                Text("Siew zbóż")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.48, saturation: 0.762, brightness: 0.893))
+                Text("Orka, przekopywanie, bronowanie, wałowanie, niszczenie chwastów, nawożenie pól, łąk")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.271, saturation: 0.963, brightness: 0.949))
+                Text("Siew lnu, kukurydzy, prosa, zbóż, ziemniaków")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.164, saturation: 1.0, brightness: 1.0))
+                Text("Pierwsze sianokosy")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.294, saturation: 0.437, brightness: 0.981))
+                Text("Redlenie, podorywki, niszczenie chwastów")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.752, saturation: 0.437, brightness: 0.981))
+                Text("Ścinanie traw i żniwa zbóż")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.859, saturation: 0.437, brightness: 0.981))
+                Text("Żniwa rzepaku i wczesnych ziemniaków")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.007, saturation: 0.27, brightness: 0.702))
+                Text("Zbiór ziemniaków, nawożenie pól kompostem, orki, podorywki, bronowanie, spulchnianie okopywanie")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.314, saturation: 0.167, brightness: 0.702))
+                Text("Zbiór kukurydzy")
+            }
+            HStack(spacing: 10) {
+                Circle()
+                    .frame(width: 20, height: 20)
+                    .foregroundColor(Color(hue: 0.146, saturation: 0.491, brightness: 0.787))
+                Text("Ścinanie trawy")
             }
             Spacer()
             Button(action: {
@@ -147,7 +208,8 @@ struct LegendView: View {
 
 func getMonthName(_ month: Int) -> String {
     let dateFormatter = DateFormatter()
-    return dateFormatter.monthSymbols[month - 1]
+    dateFormatter.locale = Locale(identifier: "pl_PL")
+    return dateFormatter.standaloneMonthSymbols[month-1]
 }
 
 func getDayOfWeekSymbol(_ dayOfWeek: Int) -> String {

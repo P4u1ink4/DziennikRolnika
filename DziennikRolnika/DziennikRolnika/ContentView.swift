@@ -61,13 +61,13 @@ struct ContentView: View {
                 HStack{
                     Image("\(weatherDescription)")
                     Text("\(weatherDescription)")
-                        .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
+                        .foregroundColor(Color("MyColor2"))
                                 
                     Button("Odśwież") {
                         getWeatherForPoznan()
                     }
                     .padding(5.0)
-                    .foregroundColor(.gray)
+                    .foregroundColor(Color("MyColor2"))
                 }
                 Spacer()
                     .frame(height: 20.0)
@@ -84,7 +84,7 @@ struct ContentView: View {
                                 let task = viewModel.tasks[index]
                                 Text(task)
                                     .frame(width: 200.0)
-                                    .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
+                                    .foregroundColor(Color("MyColor2"))
                                     .font(.footnote)
                                     .offset(x: isDeleting && taskToDeleteIndex == index ? offset.width : 0, y: 0)
                                     .gesture(
@@ -124,23 +124,21 @@ struct ContentView: View {
                 
                 Spacer()
                     .frame(height: 20.0)
-                VStack(alignment: .center, spacing: 15.0){
+                VStack(alignment: .center, spacing: 50.0){
                     NavigationLink(destination: YearCalender()) {
                         Text("Kalendarz roczny")
-                            .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
+                            .foregroundColor(Color("MyColor2"))
                     }
                     NavigationLink(destination: Cows()) {
                         Text("Spis krów")
-                            .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
+                            .foregroundColor(Color("MyColor2"))
                     }
                     NavigationLink(destination: Fields()) {
                         Text("Spis pól")
-                            .foregroundColor(Color(hue: 1.0, saturation: 0.013, brightness: 0.304))
+                            .foregroundColor(Color("MyColor2"))
                     }
                     }
                     .padding()
-                Spacer()
-                    .frame(height: 100.0)
 
             }
         }
