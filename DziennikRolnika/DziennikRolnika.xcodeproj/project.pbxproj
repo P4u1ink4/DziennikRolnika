@@ -30,10 +30,10 @@
 		C22A17FD2A8A4C220004AEA2 /* 40.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C22A17F02A8A4C210004AEA2 /* 40.jpg */; };
 		C22A17FE2A8A4C220004AEA2 /* 87.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C22A17F12A8A4C210004AEA2 /* 87.jpg */; };
 		C22A17FF2A8A4C220004AEA2 /* 152.jpg in Resources */ = {isa = PBXBuildFile; fileRef = C22A17F22A8A4C210004AEA2 /* 152.jpg */; };
+		C27743F82A8FF85A008BF497 /* Cows.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27743F72A8FF85A008BF497 /* Cows.swift */; };
 		C27A8F5E2A780A0F00F1FD3F /* DziennikRolnikaApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F5D2A780A0F00F1FD3F /* DziennikRolnikaApp.swift */; };
 		C27A8F602A780A0F00F1FD3F /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F5F2A780A0F00F1FD3F /* ContentView.swift */; };
 		C27A8F652A780A1200F1FD3F /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C27A8F642A780A1200F1FD3F /* Preview Assets.xcassets */; };
-		C27A8F6C2A78312E00F1FD3F /* Cows.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F6B2A78312E00F1FD3F /* Cows.swift */; };
 		C27A8F6E2A78314400F1FD3F /* Fields.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F6D2A78314400F1FD3F /* Fields.swift */; };
 		C27A8F702A78314F00F1FD3F /* YearCalender.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F6F2A78314F00F1FD3F /* YearCalender.swift */; };
 		C27A8F7A2A785F5100F1FD3F /* WeatherService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F792A785F5100F1FD3F /* WeatherService.swift */; };
@@ -64,11 +64,11 @@
 		C22A17F02A8A4C210004AEA2 /* 40.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 40.jpg; sourceTree = "<group>"; };
 		C22A17F12A8A4C210004AEA2 /* 87.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 87.jpg; sourceTree = "<group>"; };
 		C22A17F22A8A4C210004AEA2 /* 152.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = 152.jpg; sourceTree = "<group>"; };
+		C27743F72A8FF85A008BF497 /* Cows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cows.swift; sourceTree = "<group>"; };
 		C27A8F5A2A780A0F00F1FD3F /* DziennikRolnika.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DziennikRolnika.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C27A8F5D2A780A0F00F1FD3F /* DziennikRolnikaApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DziennikRolnikaApp.swift; sourceTree = "<group>"; };
 		C27A8F5F2A780A0F00F1FD3F /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C27A8F642A780A1200F1FD3F /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		C27A8F6B2A78312E00F1FD3F /* Cows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Cows.swift; sourceTree = "<group>"; };
 		C27A8F6D2A78314400F1FD3F /* Fields.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fields.swift; sourceTree = "<group>"; };
 		C27A8F6F2A78314F00F1FD3F /* YearCalender.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearCalender.swift; sourceTree = "<group>"; };
 		C27A8F792A785F5100F1FD3F /* WeatherService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WeatherService.swift; sourceTree = "<group>"; };
@@ -142,9 +142,9 @@
 			isa = PBXGroup;
 			children = (
 				C27A8F5D2A780A0F00F1FD3F /* DziennikRolnikaApp.swift */,
+				C27743F72A8FF85A008BF497 /* Cows.swift */,
 				C27A8F5F2A780A0F00F1FD3F /* ContentView.swift */,
 				C27A8F632A780A1200F1FD3F /* Preview Content */,
-				C27A8F6B2A78312E00F1FD3F /* Cows.swift */,
 				C27A8F6D2A78314400F1FD3F /* Fields.swift */,
 				C27A8F6F2A78314F00F1FD3F /* YearCalender.swift */,
 				C27A8F792A785F5100F1FD3F /* WeatherService.swift */,
@@ -259,10 +259,10 @@
 				C27A8F602A780A0F00F1FD3F /* ContentView.swift in Sources */,
 				C27A8F702A78314F00F1FD3F /* YearCalender.swift in Sources */,
 				C27A8F5E2A780A0F00F1FD3F /* DziennikRolnikaApp.swift in Sources */,
+				C27743F82A8FF85A008BF497 /* Cows.swift in Sources */,
 				C27A8F7E2A7E777600F1FD3F /* SpecialDays.swift in Sources */,
 				C27A8F6E2A78314400F1FD3F /* Fields.swift in Sources */,
 				C27A8F7A2A785F5100F1FD3F /* WeatherService.swift in Sources */,
-				C27A8F6C2A78312E00F1FD3F /* Cows.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

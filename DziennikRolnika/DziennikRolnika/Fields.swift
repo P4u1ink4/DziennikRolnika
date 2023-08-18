@@ -9,14 +9,15 @@ import MapKit
 
 struct Fields: View {
     @ObservedObject var viewModel = FieldViewModel()
-    @ObservedObject private var colorPickerManager = ColorPickerManager()
-    
     @State private var selectedCategoryFilters: Set<String> = []
     @State private var selectedField: Field?
     @State private var showAddFieldSheet = false
     @State private var isCategoryFilterSheetPresented = false
     @State private var isFilterApplied = false
     @State private var allCategories: Set<String> = [] // Nowa zmienna
+    @ObservedObject var colorManager = ColorManager()
+    
+    @GestureState private var tapGestureState = false
     
     
     var filteredFields: [Field] {
@@ -38,31 +39,36 @@ struct Fields: View {
                 .sheet(isPresented: $isCategoryFilterSheetPresented, content: {
                     CategoryFilterSheet(selectedCategoryFilters: $selectedCategoryFilters, allCategories: allCategories, isFilterApplied: $isFilterApplied, isCategoryFilterSheetPresented: $isCategoryFilterSheetPresented)
                 })
-
-                MapView(fields: filteredFields, selectedField: $selectedField, selectedCategoryFilters: selectedCategoryFilters, color: colorPickerManager.selectedColor)
+                
+                MapView(fields: filteredFields, selectedField: $selectedField, selectedCategoryFilters: selectedCategoryFilters, color:  colorManager.selectedColor,  tapGestureState: tapGestureState)
                     .frame(height: 500)
-            
+                
+                
                 VStack {
-                    ColorPicker("", selection: $colorPickerManager.selectedColor)
+                    ColorPicker("", selection:  $colorManager.selectedColor)
                 }
                 .frame(maxWidth: 50, maxHeight: 50)
             }
             .navigationBarItems(trailing:
-                Button(action: {
-                    showAddFieldSheet.toggle()
-                }) {
-                    Image(systemName: "plus")
-                }
+                                    Button(action: {
+                showAddFieldSheet.toggle()
+            }) {
+                Image(systemName: "plus")
+            }
             )
             .sheet(isPresented: $showAddFieldSheet, content: {
                 AddFieldView(allCategories: $allCategories, onAddField: { newField in
-                    viewModel.fields.append(newField)
+                    viewModel.addField(newField)
                     allCategories.insert(newField.category) // Dodaj nową kategorię do allCategories
                 })
             })
         }
         .onAppear {
-            updateAllCategories() // Aktualizuj allCategories na podstawie dostępnych kategorii
+            updateAllCategories()
+            colorManager.loadSelectedColor()
+        }
+        .onDisappear {
+            colorManager.saveSelectedColor()
         }
     }
     
@@ -75,21 +81,109 @@ struct Fields: View {
     }
 }
 
-class ColorPickerManager: ObservableObject {
+class ColorManager: ObservableObject {
+    
     @Published var selectedColor: Color = .white
+    
+    init() {
+        loadSelectedColor()
+    }
+    
+    func saveSelectedColor() {
+            UserDefaults.standard.set(selectedColor.description, forKey: "colorKey")
+        }
+        
+    func loadSelectedColor() {
+        if let colorString = UserDefaults.standard.string(forKey: "colorKey"),
+            let loadedColor = colorFromString(colorString) {
+            selectedColor = loadedColor
+        }
+    }
+    
+    func colorFromString(_ colorString: String) -> Color? {
+        let components = colorString.split(separator: " ")
+        if components.count == 4,
+            let red = Double(components[1]),
+            let green = Double(components[2]),
+            let blue = Double(components[3]),
+            let opacity = Double(components[4]) {
+            return Color(
+                .sRGB,
+                red: red,
+                green: green,
+                blue: blue,
+                opacity: opacity
+            )
+        }
+        return nil
+    }
 }
+
 
 class FieldViewModel: ObservableObject {
     @Published var fields: [Field] = []
+
+    private let fieldsKey = "savedFieldsKey"
+
+    init() {
+        loadFields()
+    }
+
+    func addField(_ field: Field) {
+        fields.append(field)
+        saveFields()
+    }
+
+    private func saveFields() {
+        var serializedFields: [[String: Any]] = []
+        
+        for field in fields {
+            let serializedField: [String: Any] = [
+                "id": field.id.uuidString,
+                "latitude": field.location.latitude,
+                "longitude": field.location.longitude,
+                "category": field.category,
+                "history": field.history
+            ]
+            serializedFields.append(serializedField)
+        }
+        
+        UserDefaults.standard.set(serializedFields, forKey: fieldsKey)
+    }
+
+    private func loadFields() {
+        if let savedFields = UserDefaults.standard.array(forKey: fieldsKey) as? [[String: Any]] {
+            var loadedFields: [Field] = []
+            
+            for serializedField in savedFields {
+                if let fieldIDString = serializedField["id"] as? String,
+                   let latitude = serializedField["latitude"] as? CLLocationDegrees,
+                   let longitude = serializedField["longitude"] as? CLLocationDegrees,
+                   let category = serializedField["category"] as? String,
+                   let history = serializedField["history"] as? String {
+                    
+                    let fieldID = UUID(uuidString: fieldIDString) ?? UUID()
+                    let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+                    let loadedField = Field(location: location, category: category, history: history)
+                    loadedFields.append(loadedField)
+                }
+            }
+            
+            fields = loadedFields
+        }
+    }
 }
+
 
 struct MapView: View {
     var fields: [Field]
     @Binding var selectedField: Field?
     var selectedCategoryFilters: Set<String>
     var color: Color
+    var tapGestureState: Bool
     
     @State private var isShowingDetails = false
+    
     
     var body: some View {
         Map(coordinateRegion: regionForFields(), showsUserLocation: false, userTrackingMode: nil, annotationItems: annotationItems) { field in
@@ -102,11 +196,13 @@ struct MapView: View {
                         .fill(color)
                         .frame(width: 20, height: 20)
                 }
+                .onTapGesture { // Włączamy gest tap tylko jeśli gestureTapState jest aktywny
+                    if tapGestureState {
+                        selectedField = field
+                        isShowingDetails.toggle()
+                    }
+                }
             }
-        }
-        .onTapGesture { // Clear selection when tapping outside pins
-            selectedField = nil
-            isShowingDetails = false
         }
         .frame(height: 500)
         .sheet(isPresented: $isShowingDetails) {

@@ -37,17 +37,25 @@ enum EventType: String {
 
 class CowManager: ObservableObject {
     @Published var cows: [Cow] = []
+    private let cowsKey = "savedCowsKey"
+
+    init() {
+        loadCows()
+    }
+
 
     func removeCow(id: UUID) {
         cows.removeAll { cow in
             cow.id == id
         }
+        saveCows()
     }
 
     func addEvent(to cowID: UUID, event: Event) {
         if let cowIndex = cows.firstIndex(where: { $0.id == cowID }) {
             cows[cowIndex].events.append(event)
         }
+        saveCows()
     }
 
     func removeEvent(from cowID: UUID, eventID: UUID) {
@@ -56,11 +64,81 @@ class CowManager: ObservableObject {
                 event.id == eventID
             }
         }
+        saveCows()
     }
     
     func addCow(identificationNumber: String, birthDate: Date, breed: String, lactation: String) {
         cows.append(Cow(identificationNumber: identificationNumber, birthDate: birthDate, breed: breed, lactation: lactation, events: []))
+        saveCows()
     }
+    
+    private func saveCows() {
+        var serializedCows: [[String: Any]] = []
+        
+        for cow in cows {
+            var serializedCow: [String: Any] = [
+                "id": cow.id.uuidString,
+                "identificationNumber": cow.identificationNumber,
+                "birthDate": cow.birthDate,
+                "breed": cow.breed,
+                "lactation": cow.lactation,
+                "events": []  // Inicjalizujemy pustą tablicę dla zdarzeń
+            ]
+            
+            for event in cow.events {
+                let serializedEvent: [String: Any] = [
+                    "id": event.id.uuidString,
+                    "type": event.type.rawValue,
+                    "date": event.date,
+                    "notes": event.notes
+                ]
+                // Dodajemy zdarzenie do tablicy zdarzeń
+                serializedCow["events"] = (serializedCow["events"] as? [[String: Any]] ?? []) + [serializedEvent]
+            }
+            
+            serializedCows.append(serializedCow)
+        }
+        
+        UserDefaults.standard.set(serializedCows, forKey: cowsKey)
+    }
+
+    private func loadCows() {
+        if let savedCows = UserDefaults.standard.array(forKey: cowsKey) as? [[String: Any]] {
+            var loadedCows: [Cow] = []
+            
+            for serializedCow in savedCows {
+                if let cowIDString = serializedCow["id"] as? String,
+                   let cowIdentificationNumber = serializedCow["identificationNumber"] as? String,
+                   let cowBirthDate = serializedCow["birthDate"] as? Date,
+                   let cowBreed = serializedCow["breed"] as? String,
+                   let cowLactation = serializedCow["lactation"] as? String,
+                   let serializedEvents = serializedCow["events"] as? [[String: Any]] {
+                    
+                    var loadedEvents: [Event] = []
+                    for serializedEvent in serializedEvents {
+                        if let eventIDString = serializedEvent["id"] as? String,
+                           let eventTypeString = serializedEvent["type"] as? String,
+                           let eventDate = serializedEvent["date"] as? Date,
+                           let eventNotes = serializedEvent["notes"] as? String,
+                           let eventType = EventType(rawValue: eventTypeString) {
+                            
+                            let eventID = UUID(uuidString: eventIDString) ?? UUID()
+                            let loadedEvent = Event( type: eventType, date: eventDate, notes: eventNotes)
+                            loadedEvents.append(loadedEvent)
+                        }
+                    }
+                    
+                    let cowID = UUID(uuidString: cowIDString) ?? UUID()
+                    let loadedCow = Cow( identificationNumber: cowIdentificationNumber, birthDate: cowBirthDate, breed: cowBreed, lactation: cowLactation, events: loadedEvents)
+                    loadedCows.append(loadedCow)
+                }
+            }
+            
+            cows = loadedCows
+        }
+    }
+
+    
 }
 
 struct AddCowView: View {
@@ -330,7 +408,7 @@ struct CowDetail: View {
             }
 
             DatePicker("Data", selection: $newEventDate, displayedComponents: .date)
-                .padding()
+                .padding(.horizontal)
             
             Picker(selection: $selectedEventType, label: Text("Zdarzenie")) {
                 ForEach(EventType.allTypes, id: \.self) { type in
@@ -339,7 +417,7 @@ struct CowDetail: View {
                 }
             }
             .pickerStyle(MenuPickerStyle()) // Ustawienie stylu pickera
-            .padding()
+            .padding(.horizontal)
 
             
             TextField("Notatki", text: $eventNotes)
@@ -352,7 +430,7 @@ struct CowDetail: View {
                 selectedEventType = .calving
                 eventNotes = ""
             }
-            .padding()
+            .padding(.horizontal)
             
             Button("Usuń krowę") {
                 cowManager.removeCow(id: cow.id)

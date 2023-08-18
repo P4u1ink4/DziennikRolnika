@@ -148,15 +148,33 @@ struct ContentView: View {
 class TaskViewModel: ObservableObject {
     @Published var tasks: [String] = []
 
+    private let tasksKey = "savedTasksKey"
+
+    init() {
+        loadTasks()
+    }
+
     func addTask(title: String) {
         tasks.append(title)
+        saveTasks()
     }
 
     func removeTask(at index: IndexSet) {
         tasks.remove(atOffsets: index)
+        saveTasks()
     }
 
+    private func saveTasks() {
+        UserDefaults.standard.set(tasks, forKey: tasksKey)
+    }
+
+    private func loadTasks() {
+        if let savedTasks = UserDefaults.standard.array(forKey: tasksKey) as? [String] {
+            tasks = savedTasks
+        }
+    }
 }
+
 
 struct AddTaskView: View {
     @State private var taskTitle = ""
