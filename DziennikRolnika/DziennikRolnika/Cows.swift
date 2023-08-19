@@ -14,6 +14,7 @@ struct Cow: Identifiable {
     let breed: String
     let lactation: String
     var events: [Event]
+    var image: Data?
 }
 
 struct Event: Identifiable {
@@ -67,8 +68,8 @@ class CowManager: ObservableObject {
         saveCows()
     }
     
-    func addCow(identificationNumber: String, birthDate: Date, breed: String, lactation: String) {
-        cows.append(Cow(identificationNumber: identificationNumber, birthDate: birthDate, breed: breed, lactation: lactation, events: []))
+    func addCow(identificationNumber: String, birthDate: Date, breed: String, lactation: String, image: Data?) {
+        cows.append(Cow(identificationNumber: identificationNumber, birthDate: birthDate, breed: breed, lactation: lactation, events: [], image: image))
         saveCows()
     }
     
@@ -82,8 +83,13 @@ class CowManager: ObservableObject {
                 "birthDate": cow.birthDate,
                 "breed": cow.breed,
                 "lactation": cow.lactation,
-                "events": []  // Inicjalizujemy pustą tablicę dla zdarzeń
+                "events": []
             ]
+            
+            // Convert UIImage to Data before saving
+            if let image = cow.image {
+                serializedCow["image"] = image
+            }
             
             for event in cow.events {
                 let serializedEvent: [String: Any] = [
@@ -92,7 +98,6 @@ class CowManager: ObservableObject {
                     "date": event.date,
                     "notes": event.notes
                 ]
-                // Dodajemy zdarzenie do tablicy zdarzeń
                 serializedCow["events"] = (serializedCow["events"] as? [[String: Any]] ?? []) + [serializedEvent]
             }
             
@@ -101,6 +106,7 @@ class CowManager: ObservableObject {
         
         UserDefaults.standard.set(serializedCows, forKey: cowsKey)
     }
+
 
     private func loadCows() {
         if let savedCows = UserDefaults.standard.array(forKey: cowsKey) as? [[String: Any]] {
@@ -112,8 +118,9 @@ class CowManager: ObservableObject {
                    let cowBirthDate = serializedCow["birthDate"] as? Date,
                    let cowBreed = serializedCow["breed"] as? String,
                    let cowLactation = serializedCow["lactation"] as? String,
+                   let cowImage = serializedCow["image"] as? Data,
                    let serializedEvents = serializedCow["events"] as? [[String: Any]] {
-                    
+                   
                     var loadedEvents: [Event] = []
                     for serializedEvent in serializedEvents {
                         if let eventIDString = serializedEvent["id"] as? String,
@@ -122,14 +129,14 @@ class CowManager: ObservableObject {
                            let eventNotes = serializedEvent["notes"] as? String,
                            let eventType = EventType(rawValue: eventTypeString) {
                             
-                            let eventID = UUID(uuidString: eventIDString) ?? UUID()
+                            _ = UUID(uuidString: eventIDString) ?? UUID()
                             let loadedEvent = Event( type: eventType, date: eventDate, notes: eventNotes)
                             loadedEvents.append(loadedEvent)
                         }
                     }
                     
-                    let cowID = UUID(uuidString: cowIDString) ?? UUID()
-                    let loadedCow = Cow( identificationNumber: cowIdentificationNumber, birthDate: cowBirthDate, breed: cowBreed, lactation: cowLactation, events: loadedEvents)
+                    _ = UUID(uuidString: cowIDString) ?? UUID()
+                    let loadedCow = Cow( identificationNumber: cowIdentificationNumber, birthDate: cowBirthDate, breed: cowBreed, lactation: cowLactation, events: loadedEvents, image: cowImage)
                     loadedCows.append(loadedCow)
                 }
             }
@@ -164,6 +171,10 @@ struct AddCowView: View {
     @State private var digit12 = ""
 
     @State private var digits = ""
+    
+    @State private var drawing = Path()
+    @State private var drawingColor: Color = .black
+    @State private var savedImage: UIImage?
     
     var body: some View {
         NavigationView {
@@ -224,21 +235,82 @@ struct AddCowView: View {
                     TextField("Rasa", text: $breed)
                     TextField("Laktacja", text: $lactation)
                 }
-                Image("cow")
-                    .padding()
+                DrawableView(drawing: $drawing, drawingColor: $drawingColor)
+                    .gesture(DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            let currentPoint = value.location
+                            drawing.addLine(to: currentPoint)
+                        }
+                        .onEnded { _ in
+                            drawing.move(to: .zero)
+                        }
+                    )
                 Button("Dodaj krowę") {
                     if(!prefix1.isEmpty && !prefix2.isEmpty && !digit1.isEmpty && !digit2.isEmpty && !digit3.isEmpty && !digit4.isEmpty && !digit5.isEmpty && !digit6.isEmpty && !digit7.isEmpty && !digit8.isEmpty && !digit9.isEmpty && !digit10.isEmpty && !digit11.isEmpty && !digit12.isEmpty){
                             let identificationNumber = prefix1 + prefix2 + digit1 + digit2 + digit3 + digit4 + digit5 + digit6 + digit7 + digit8 + digit9 + digit10 + digit11 + digit12
-                            cowManager.addCow(identificationNumber: identificationNumber, birthDate: birthDate, breed: breed, lactation: lactation)
-                            presentationMode.wrappedValue.dismiss()
+                        cowManager.addCow(identificationNumber: identificationNumber, birthDate: birthDate, breed: breed, lactation: lactation, image: createImageFromDrawableView(drawing: $drawing, drawingColor: $drawingColor, cowImage: UIImage(imageLiteralResourceName: "cow")).pngData())
+                                presentationMode.wrappedValue.dismiss()
                     }
                 }
             }
             .navigationBarTitle("Nowa krowa")
         }
     }
+    func createImageFromDrawableView(drawing: Binding<Path>, drawingColor: Binding<Color>, cowImage: UIImage) -> UIImage {
+        let targetSize = CGSize(width: 150, height: 150)
+
+        UIGraphicsBeginImageContextWithOptions(targetSize, false, 0)
+        
+        // Draw the cow image
+        cowImage.draw(in: CGRect(origin: .zero, size: targetSize))
+        
+        // Draw the drawing path
+        let context = UIGraphicsGetCurrentContext()
+        context?.addPath(drawing.wrappedValue.cgPath)
+        context?.setStrokeColor(drawingColor.wrappedValue.cgColor!)
+        context?.setLineWidth(2)
+        context?.strokePath()
+
+        let combinedImage = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+
+        return combinedImage ?? UIImage()
+    }
 }
 
+struct DrawableView: View {
+    @Binding var drawing: Path
+    @Binding var drawingColor: Color
+    @State private var currentPoint: CGPoint?
+    @State private var lastPoint: CGPoint?
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Image("cow")
+                .resizable()
+                .frame(width: 150,height: 150)
+                .gesture(
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { value in
+                            currentPoint = value.location
+                            if let lastPoint = lastPoint, let currentPoint = currentPoint {
+                                drawing.move(to: lastPoint)
+                                drawing.addLine(to: currentPoint)
+                            }
+                            lastPoint = currentPoint
+                        }
+                        .onEnded { _ in
+                            currentPoint = nil
+                            lastPoint = nil
+                        }
+                )
+            Path { path in
+                path.addPath(drawing)
+            }
+            .stroke(drawingColor, lineWidth: 2)
+        }
+    }
+}
 
 struct Cows: View {
     @ObservedObject private var cowManager = CowManager()
@@ -380,20 +452,32 @@ struct CowDetail: View {
             }
             HStack(spacing:50){
                 VStack{
-                    Text("Data urodzenia:\n\(formattedDate(date:cow.birthDate))")
+                    Text("Data urodzenia:")
                         .font(.footnote)
-                        .padding(.leading)
+                        .padding(.horizontal)
+                        .scaledToFit()
+                    Text(formattedDate(date:cow.birthDate))
+                        .font(.footnote)
+                        .padding(.horizontal)
+                        .scaledToFit()
                     Text("Rasa: \(cow.breed)")
                         .font(.footnote)
-                        .padding(.leading)
+                        .padding(.horizontal)
+                        .scaledToFit()
                     Text("Laktacja: \(cow.lactation)")
                         .font(.footnote)
-                        .padding(.leading)
+                        .padding(.horizontal)
+                        .scaledToFit()
                 }
-                Image("cow")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(width: 150,height: 150)
+                if let imageData = cow.image, let uiImage = UIImage(data: imageData) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .frame(width: 150, height: 150)
+                } else {
+                    Image("cow")
+                        .resizable()
+                        .frame(width: 150, height: 150)
+                }
             }
             
             List(cow.events) { event in
@@ -452,3 +536,5 @@ struct Cows_Previews: PreviewProvider {
         Cows()
     }
 }
+
+
