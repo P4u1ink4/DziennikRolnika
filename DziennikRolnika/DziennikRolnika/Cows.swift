@@ -163,6 +163,8 @@ struct AddCowView: View {
     @State private var digit11 = ""
     @State private var digit12 = ""
 
+    @State private var digits = ""
+    
     var body: some View {
         NavigationView {
             Form {
@@ -170,105 +172,51 @@ struct AddCowView: View {
                     HStack {
                         Text("ID")
                         TextField("1", text: $prefix1)
-                            .frame(width: 15)
+                            .frame(width: 10)
                             .onChange(of: prefix1) { newValue in
                                 if newValue.count > 1 {
                                     prefix1 = String(newValue.prefix(1))
                                 }
                             }
-                        TextField("2", text: $prefix2)
-                            .frame(width: 15)
+                            .tag(1)
+                        TextField("1", text: $prefix2)
+                            .frame(width: 10)
                             .onChange(of: prefix2) { newValue in
                                 if newValue.count > 1 {
                                     prefix2 = String(newValue.prefix(1))
                                 }
                             }
-                        TextField("1", text: $digit1)
-                            .frame(width: 15)
-                            .onChange(of: digit1) { newValue in
-                                if newValue.count > 1 {
-                                    digit1 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("2", text: $digit2)
-                            .frame(width: 15)
-                            .onChange(of: digit2) { newValue in
-                                if newValue.count > 1 {
-                                    digit2 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("3", text: $digit3)
-                            .frame(width: 15)
-                            .onChange(of: digit3) { newValue in
-                                if newValue.count > 1 {
-                                    digit3 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("4", text: $digit4)
-                            .frame(width: 15)
-                            .onChange(of: digit4) { newValue in
-                                if newValue.count > 1 {
-                                    digit4 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("5", text: $digit5)
-                            .frame(width: 15)
-                            .onChange(of: digit5) { newValue in
-                                if newValue.count > 1 {
-                                    digit5 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("6", text: $digit6)
-                            .frame(width: 15)
-                            .onChange(of: digit6) { newValue in
-                                if newValue.count > 1 {
-                                    digit6 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("7", text: $digit7)
-                            .frame(width: 15)
-                            .onChange(of: digit7) { newValue in
-                                if newValue.count > 1 {
-                                    digit7 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("8", text: $digit8)
-                            .frame(width: 15)
-                            .foregroundColor(.red)
-                            .onChange(of: digit8) { newValue in
-                                if newValue.count > 1 {
-                                    digit8 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("9", text: $digit9)
-                            .frame(width: 15)
-                            .foregroundColor(.red)
-                            .onChange(of: digit9) { newValue in
-                                if newValue.count > 1 {
-                                    digit9 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("10", text: $digit10)
-                            .frame(width: 20)
-                            .foregroundColor(.red)
-                            .onChange(of: digit10) { newValue in
-                                if newValue.count > 1 {
-                                    digit10 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("11", text: $digit11)
-                            .frame(width: 20)
-                            .foregroundColor(.red)
-                            .onChange(of: digit11) { newValue in
-                                if newValue.count > 1 {
-                                    digit11 = String(newValue.prefix(1))
-                                }
-                            }
-                        TextField("12", text: $digit12)
-                            .frame(width: 20)
-                            .onChange(of: digit12) { newValue in
-                                if newValue.count > 1 {
-                                    digit12 = String(newValue.prefix(1))
+                            .tag(1)
+                        TextField("123456789101112", text: $digits )
+                            .tracking(6.5)
+                            .textFieldStyle(RoundedBorderTextFieldStyle())
+                            .frame(width: 250)
+                            .keyboardType(.numberPad)
+                            .onChange(of: digits) { newValue in
+                                if newValue.count >= 12 {
+                                    digits = String(newValue.prefix(12))
+                                    
+                                   let indices = 0..<12
+                                    for index in indices {
+                                        let currentIndex = digits.index(digits.startIndex, offsetBy: index)
+                                        
+                                        let digit = String(digits[currentIndex])
+                                        switch index {
+                                        case 0: digit1 = digit
+                                        case 1: digit2 = digit
+                                        case 2: digit3 = digit
+                                        case 3: digit4 = digit
+                                        case 4: digit5 = digit
+                                        case 5: digit6 = digit
+                                        case 6: digit7 = digit
+                                        case 7: digit8 = digit
+                                        case 8: digit9 = digit
+                                        case 9: digit10 = digit
+                                        case 10: digit11 = digit
+                                        case 11: digit12 = digit
+                                        default: break
+                                        }
+                                    }
                                 }
                             }
                     }
@@ -289,14 +237,18 @@ struct AddCowView: View {
     }
 }
 
+
 struct Cows: View {
     @ObservedObject private var cowManager = CowManager()
+    
     @State private var digit1 = ""
     @State private var digit2 = ""
     @State private var digit3 = ""
     @State private var digit4 = ""
     @State private var isAddingCowSheetPresented = false
 
+    let characterLimit = 1
+    
     var filteredCows: [Cow] {
         let inputDigits = digit1 + digit2 + digit3 + digit4
 
@@ -341,22 +293,10 @@ struct Cows: View {
         NavigationView {
             VStack {
                 HStack {
-                    TextField("1", text: $digit1)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 50)
-                        .foregroundColor(.red)
-                    TextField("2", text: $digit2)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 50)
-                        .foregroundColor(.red)
-                    TextField("3", text: $digit3)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 50)
-                        .foregroundColor(.red)
-                    TextField("4", text: $digit4)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        .frame(width: 50)
-                        .foregroundColor(.red)
+                    NumericTextField(placeholder: "1", text: $digit1, nextField: $digit2)
+                    NumericTextField(placeholder: "2", text: $digit2, nextField: $digit3)
+                    NumericTextField(placeholder: "3", text: $digit3, nextField: $digit4)
+                    NumericTextField(placeholder: "4", text: $digit4, nextField: $digit4)
                     Button("Dodaj krowę") {
                         isAddingCowSheetPresented.toggle()
                     }
@@ -364,7 +304,20 @@ struct Cows: View {
                 }
                 List(filteredCows) { cow in
                     NavigationLink(destination: CowDetail(cow: cow, cowManager: cowManager)) {
-                        Text(cow.identificationNumber)
+                        HStack(spacing: 0) {
+                            Text(cow.identificationNumber.dropLast(5))
+                                .font(Font.system(size: 20))
+                                .tracking(2)
+                                .foregroundColor(.black)
+                            Text(cow.identificationNumber.suffix(5).dropLast(1))
+                                .font(Font.system(size: 23))
+                                .tracking(2)
+                                .foregroundColor(.red)
+                            Text(cow.identificationNumber.suffix(1))
+                                .tracking(2)
+                                .font(Font.system(size:20))
+                                .foregroundColor(.black)
+                        }
                     }
                 }
             }
@@ -376,6 +329,25 @@ struct Cows: View {
     }
 }
 
+struct NumericTextField: View {
+    var placeholder: String
+    @Binding var text: String
+    @Binding var nextField: String
+    
+    var body: some View {
+        TextField(placeholder, text: $text )
+            .textFieldStyle(RoundedBorderTextFieldStyle())
+            .frame(width: 40)
+            .foregroundColor(.red)
+            .keyboardType(.numberPad)
+            .onChange(of: text) { newValue in
+                if newValue.count > 1 {
+                    text = String(newValue.prefix(1))
+                    nextField = String(newValue.suffix(1))
+                }
+            }
+    }
+}
 
 struct CowDetail: View {
     let cow: Cow
@@ -387,9 +359,25 @@ struct CowDetail: View {
 
     var body: some View {
         VStack {
-            Text("ID: \(cow.identificationNumber)")
-                .font(.title)
-                .padding()
+            HStack(spacing: 0) {
+                Text("ID: ")
+                    .font(.title)
+                    .padding()
+                    .tracking(2)
+                Text(cow.identificationNumber.dropLast(5))
+                    .tracking(2)
+                    .font(.title)
+                    .foregroundColor(.black)
+                Text(cow.identificationNumber.suffix(5).dropLast(1))
+                    .font(.title)
+                    .tracking(2)
+                    .foregroundColor(.red)
+                Text(cow.identificationNumber.suffix(1))
+                    .tracking(2)
+                    .font(.title)
+                    .foregroundColor(.black)
+            }
+            
             Text("Data urodzenia: \(formattedDate(date:cow.birthDate))")
                 .font(.footnote)
             Text("Rasa: \(cow.breed)")
