@@ -8,6 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		C20155B62A90FBA9007D4D3A /* cow.png in Resources */ = {isa = PBXBuildFile; fileRef = C20155B52A90FBA9007D4D3A /* cow.png */; };
+		C20155C02A91264C007D4D3A /* DziennikRolnikaTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20155BF2A91264C007D4D3A /* DziennikRolnikaTests.swift */; };
+		C20155C62A912659007D4D3A /* YearCalenderTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20155B72A91256B007D4D3A /* YearCalenderTest.swift */; };
+		C20155C82A912877007D4D3A /* FieldsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20155C72A912877007D4D3A /* FieldsTest.swift */; };
+		C20155CA2A91299A007D4D3A /* CowsTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20155C92A91299A007D4D3A /* CowsTest.swift */; };
+		C20155CC2A912C17007D4D3A /* ContentViewTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20155CB2A912C17007D4D3A /* ContentViewTest.swift */; };
 		C22A17012A8427510004AEA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C22A17002A8427510004AEA2 /* Assets.xcassets */; };
 		C22A17D22A8A07E60004AEA2 /* 389.png in Resources */ = {isa = PBXBuildFile; fileRef = C22A17C92A8A07E60004AEA2 /* 389.png */; };
 		C22A17D32A8A07E60004AEA2 /* 116.png in Resources */ = {isa = PBXBuildFile; fileRef = C22A17CA2A8A07E60004AEA2 /* 116.png */; };
@@ -41,8 +46,24 @@
 		C27A8F7E2A7E777600F1FD3F /* SpecialDays.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27A8F7D2A7E777600F1FD3F /* SpecialDays.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		C20155C12A91264C007D4D3A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = C27A8F522A780A0F00F1FD3F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C27A8F592A780A0F00F1FD3F;
+			remoteInfo = DziennikRolnika;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		C20155B52A90FBA9007D4D3A /* cow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cow.png; path = DziennikRolnika/cow.png; sourceTree = SOURCE_ROOT; };
+		C20155B72A91256B007D4D3A /* YearCalenderTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = YearCalenderTest.swift; sourceTree = "<group>"; };
+		C20155BD2A91264C007D4D3A /* DziennikRolnikaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DziennikRolnikaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C20155BF2A91264C007D4D3A /* DziennikRolnikaTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DziennikRolnikaTests.swift; sourceTree = "<group>"; };
+		C20155C72A912877007D4D3A /* FieldsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldsTest.swift; sourceTree = "<group>"; };
+		C20155C92A91299A007D4D3A /* CowsTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CowsTest.swift; sourceTree = "<group>"; };
+		C20155CB2A912C17007D4D3A /* ContentViewTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentViewTest.swift; sourceTree = "<group>"; };
 		C22A17002A8427510004AEA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C22A17C92A8A07E60004AEA2 /* 389.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 389.png; sourceTree = "<group>"; };
 		C22A17CA2A8A07E60004AEA2 /* 116.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 116.png; sourceTree = "<group>"; };
@@ -78,6 +99,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		C20155BA2A91264C007D4D3A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C27A8F572A780A0F00F1FD3F /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -88,6 +116,18 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C20155BE2A91264C007D4D3A /* DziennikRolnikaTests */ = {
+			isa = PBXGroup;
+			children = (
+				C20155BF2A91264C007D4D3A /* DziennikRolnikaTests.swift */,
+				C20155B72A91256B007D4D3A /* YearCalenderTest.swift */,
+				C20155C72A912877007D4D3A /* FieldsTest.swift */,
+				C20155C92A91299A007D4D3A /* CowsTest.swift */,
+				C20155CB2A912C17007D4D3A /* ContentViewTest.swift */,
+			);
+			path = DziennikRolnikaTests;
+			sourceTree = "<group>";
+		};
 		C22A17C82A8A07E60004AEA2 /* icons */ = {
 			isa = PBXGroup;
 			children = (
@@ -128,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				C27A8F5C2A780A0F00F1FD3F /* DziennikRolnika */,
+				C20155BE2A91264C007D4D3A /* DziennikRolnikaTests */,
 				C27A8F5B2A780A0F00F1FD3F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -136,6 +177,7 @@
 			isa = PBXGroup;
 			children = (
 				C27A8F5A2A780A0F00F1FD3F /* DziennikRolnika.app */,
+				C20155BD2A91264C007D4D3A /* DziennikRolnikaTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -170,6 +212,24 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		C20155BC2A91264C007D4D3A /* DziennikRolnikaTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C20155C32A91264C007D4D3A /* Build configuration list for PBXNativeTarget "DziennikRolnikaTests" */;
+			buildPhases = (
+				C20155B92A91264C007D4D3A /* Sources */,
+				C20155BA2A91264C007D4D3A /* Frameworks */,
+				C20155BB2A91264C007D4D3A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				C20155C22A91264C007D4D3A /* PBXTargetDependency */,
+			);
+			name = DziennikRolnikaTests;
+			productName = DziennikRolnikaTests;
+			productReference = C20155BD2A91264C007D4D3A /* DziennikRolnikaTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		C27A8F592A780A0F00F1FD3F /* DziennikRolnika */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = C27A8F682A780A1200F1FD3F /* Build configuration list for PBXNativeTarget "DziennikRolnika" */;
@@ -194,9 +254,13 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1340;
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1500;
 				TargetAttributes = {
+					C20155BC2A91264C007D4D3A = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = C27A8F592A780A0F00F1FD3F;
+					};
 					C27A8F592A780A0F00F1FD3F = {
 						CreatedOnToolsVersion = 13.4;
 					};
@@ -216,11 +280,19 @@
 			projectRoot = "";
 			targets = (
 				C27A8F592A780A0F00F1FD3F /* DziennikRolnika */,
+				C20155BC2A91264C007D4D3A /* DziennikRolnikaTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		C20155BB2A91264C007D4D3A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C27A8F582A780A0F00F1FD3F /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -256,6 +328,18 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		C20155B92A91264C007D4D3A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C20155CC2A912C17007D4D3A /* ContentViewTest.swift in Sources */,
+				C20155C62A912659007D4D3A /* YearCalenderTest.swift in Sources */,
+				C20155CA2A91299A007D4D3A /* CowsTest.swift in Sources */,
+				C20155C82A912877007D4D3A /* FieldsTest.swift in Sources */,
+				C20155C02A91264C007D4D3A /* DziennikRolnikaTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		C27A8F562A780A0F00F1FD3F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -272,7 +356,62 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		C20155C22A91264C007D4D3A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C27A8F592A780A0F00F1FD3F /* DziennikRolnika */;
+			targetProxy = C20155C12A91264C007D4D3A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		C20155C42A91264C007D4D3A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V4Q8HHX655;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = paulinaguzior.DziennikRolnikaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DziennikRolnika.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DziennikRolnika";
+			};
+			name = Debug;
+		};
+		C20155C52A91264C007D4D3A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = V4Q8HHX655;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = paulinaguzior.DziennikRolnikaTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/DziennikRolnika.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/DziennikRolnika";
+			};
+			name = Release;
+		};
 		C27A8F662A780A1200F1FD3F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -455,6 +594,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		C20155C32A91264C007D4D3A /* Build configuration list for PBXNativeTarget "DziennikRolnikaTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C20155C42A91264C007D4D3A /* Debug */,
+				C20155C52A91264C007D4D3A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		C27A8F552A780A0F00F1FD3F /* Build configuration list for PBXProject "DziennikRolnika" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
