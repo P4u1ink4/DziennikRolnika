@@ -224,6 +224,8 @@ struct AddCowView: View {
                     TextField("Rasa", text: $breed)
                     TextField("Laktacja", text: $lactation)
                 }
+                Image("cow")
+                    .padding()
                 Button("Dodaj krowę") {
                     if(!prefix1.isEmpty && !prefix2.isEmpty && !digit1.isEmpty && !digit2.isEmpty && !digit3.isEmpty && !digit4.isEmpty && !digit5.isEmpty && !digit6.isEmpty && !digit7.isEmpty && !digit8.isEmpty && !digit9.isEmpty && !digit10.isEmpty && !digit11.isEmpty && !digit12.isEmpty){
                             let identificationNumber = prefix1 + prefix2 + digit1 + digit2 + digit3 + digit4 + digit5 + digit6 + digit7 + digit8 + digit9 + digit10 + digit11 + digit12
@@ -343,7 +345,6 @@ struct NumericTextField: View {
             .onChange(of: text) { newValue in
                 if newValue.count > 1 {
                     text = String(newValue.prefix(1))
-                    nextField = String(newValue.suffix(1))
                 }
             }
     }
@@ -377,13 +378,23 @@ struct CowDetail: View {
                     .font(.title)
                     .foregroundColor(.black)
             }
-            
-            Text("Data urodzenia: \(formattedDate(date:cow.birthDate))")
-                .font(.footnote)
-            Text("Rasa: \(cow.breed)")
-                .font(.footnote)
-            Text("Laktacja: \(cow.lactation)")
-                .font(.footnote)
+            HStack(spacing:50){
+                VStack{
+                    Text("Data urodzenia:\n\(formattedDate(date:cow.birthDate))")
+                        .font(.footnote)
+                        .padding(.leading)
+                    Text("Rasa: \(cow.breed)")
+                        .font(.footnote)
+                        .padding(.leading)
+                    Text("Laktacja: \(cow.lactation)")
+                        .font(.footnote)
+                        .padding(.leading)
+                }
+                Image("cow")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 150,height: 150)
+            }
             
             List(cow.events) { event in
                 VStack(alignment: .leading) {
@@ -409,7 +420,7 @@ struct CowDetail: View {
 
             
             TextField("Notatki", text: $eventNotes)
-                .padding()
+                .padding(.horizontal)
 
             Button("Dodaj wydarzenie") {
                 let newEvent = Event(type: selectedEventType, date: newEventDate, notes: eventNotes)
@@ -424,7 +435,7 @@ struct CowDetail: View {
                 cowManager.removeCow(id: cow.id)
             }
             .foregroundColor(.red)
-            .padding()
+            .padding(5.0)
         }
         .navigationTitle("Informacje")
     }

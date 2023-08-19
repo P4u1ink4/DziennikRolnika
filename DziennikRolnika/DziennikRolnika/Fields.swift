@@ -14,11 +14,8 @@ struct Fields: View {
     @State private var showAddFieldSheet = false
     @State private var isCategoryFilterSheetPresented = false
     @State private var isFilterApplied = false
-    @State private var allCategories: Set<String> = [] // Nowa zmienna
+    @State private var allCategories: Set<String> = []
     @ObservedObject var colorManager = ColorManager()
-    
-    @GestureState private var tapGestureState = false
-    
     
     var filteredFields: [Field] {
         if selectedCategoryFilters.isEmpty {
@@ -31,16 +28,15 @@ struct Fields: View {
     var body: some View {
         NavigationView {
             VStack {
-                Button(action: {
+                Button("Filtruj") {
                     isCategoryFilterSheetPresented.toggle()
-                }) {
-                    Text("Filtruj")
                 }
+                .padding()
                 .sheet(isPresented: $isCategoryFilterSheetPresented, content: {
-                    CategoryFilterSheet(selectedCategoryFilters: $selectedCategoryFilters, allCategories: allCategories, isFilterApplied: $isFilterApplied, isCategoryFilterSheetPresented: $isCategoryFilterSheetPresented)
+                    CategoryFilterSheet(selectedCategoryFilters: $selectedCategoryFilters, allCategories: loadAllCategories(), isFilterApplied: $isFilterApplied, isCategoryFilterSheetPresented: $isCategoryFilterSheetPresented)
                 })
                 
-                MapView(fields: filteredFields, selectedField: $selectedField, selectedCategoryFilters: selectedCategoryFilters, color:  colorManager.selectedColor,  tapGestureState: tapGestureState)
+                MapView(fields: filteredFields, selectedField: $selectedField, selectedCategoryFilters: selectedCategoryFilters, color:  colorManager.selectedColor)
                     .frame(height: 500)
                 
                 
@@ -59,12 +55,12 @@ struct Fields: View {
             .sheet(isPresented: $showAddFieldSheet, content: {
                 AddFieldView(allCategories: $allCategories, onAddField: { newField in
                     viewModel.addField(newField)
-                    allCategories.insert(newField.category) // Dodaj nową kategorię do allCategories
+                    allCategories.insert(newField.category)
+                    updateAllCategories()
                 })
             })
         }
         .onAppear {
-            updateAllCategories()
             colorManager.loadSelectedColor()
         }
         .onDisappear {
@@ -78,12 +74,24 @@ struct Fields: View {
             categories.insert(field.category)
         }
         allCategories = categories
+        saveAllCategories()
+    }
+    private func saveAllCategories() {
+        let categoriesArray = Array(allCategories)
+        UserDefaults.standard.set(categoriesArray, forKey: "allCategoriesKey")
+    }
+
+    private func loadAllCategories() -> Set<String> {
+        if let categoriesArray = UserDefaults.standard.array(forKey: "allCategoriesKey") as? [String] {
+            return Set(categoriesArray)
+        }
+        return Set<String>()
     }
 }
 
 class ColorManager: ObservableObject {
     
-    @Published var selectedColor: Color = .white
+    @Published var selectedColor: Color = .black
     
     init() {
         loadSelectedColor()
@@ -180,7 +188,6 @@ struct MapView: View {
     @Binding var selectedField: Field?
     var selectedCategoryFilters: Set<String>
     var color: Color
-    var tapGestureState: Bool
     
     @State private var isShowingDetails = false
     
@@ -188,27 +195,18 @@ struct MapView: View {
     var body: some View {
         Map(coordinateRegion: regionForFields(), showsUserLocation: false, userTrackingMode: nil, annotationItems: annotationItems) { field in
             MapAnnotation(coordinate: field.location) {
-                Button(action: {
-                    selectedField = field
-                    isShowingDetails.toggle()
-                }) {
-                    Circle()
-                        .fill(color)
-                        .frame(width: 20, height: 20)
-                }
-                .onTapGesture { // Włączamy gest tap tylko jeśli gestureTapState jest aktywny
-                    if tapGestureState {
+                Circle()
+                    .fill(color)
+                    .frame(width: 20, height: 20)
+                    .onTapGesture {
                         selectedField = field
                         isShowingDetails.toggle()
                     }
-                }
             }
         }
         .frame(height: 500)
-        .sheet(isPresented: $isShowingDetails) {
-            if let selectedField = selectedField {
-                FieldDetailsView(field: selectedField)
-            }
+        .sheet(item: $selectedField) { field in
+            FieldDetailsView(field: field)
         }
     }
     
@@ -228,6 +226,7 @@ struct MapView: View {
 }
 
 struct FieldDetailsView: View {
+    @Environment(\.dismiss) var dismiss
     var field: Field
     
     var body: some View {
@@ -243,8 +242,10 @@ struct FieldDetailsView: View {
 
 
 struct CategoryFilterSheet: View {
+    @Environment(\.presentationMode) var presentationMode
+    
     @Binding var selectedCategoryFilters: Set<String>
-    var allCategories: Set<String> // Dodana zmienna
+    var allCategories: Set<String>
     @Binding var isFilterApplied: Bool
     @Binding var isCategoryFilterSheetPresented: Bool
     
@@ -299,12 +300,26 @@ struct AddFieldView: View {
     
     var onAddField: (Field) -> Void
     
+    var centerCoordinate: CLLocationCoordinate2D {
+        return mapRegion.center
+    }
+    
     var body: some View {
         VStack {
-            Map(coordinateRegion: $mapRegion, showsUserLocation: true, annotationItems: [Field(location: mapRegion.center, category: category, history: history)]) { field in
-                MapPin(coordinate: field.location, tint: .red)
-            }
-            .frame(height: 400)
+            Map(coordinateRegion: $mapRegion, showsUserLocation: true)
+                .frame(height: 400)
+                .overlay(
+                    GeometryReader { geometry in
+                        Circle()
+                            .fill(Color.red)
+                            .frame(width: 20, height: 20)
+                            .opacity(0.8)
+                            .position(
+                                x: geometry.size.width / 2,
+                                y: geometry.size.height / 2
+                            )
+                    }
+                )
             
             TextField("Kategoria", text: $category)
                 .padding()
@@ -316,10 +331,10 @@ struct AddFieldView: View {
             
             Button("Dodaj pole") {
                 if !allCategories.contains(category) {
-                    allCategories.insert(category) // Dodaj nową kategorię do allCategories
+                    allCategories.insert(category)
                 }
                 
-                let newField = Field(location: mapRegion.center, category: category, history: history)
+                let newField = Field(location: centerCoordinate, category: category, history: history)
                 onAddField(newField)
                 presentationMode.wrappedValue.dismiss()
             }
@@ -330,6 +345,7 @@ struct AddFieldView: View {
         }
     }
 }
+
 
 
 struct Fields_Previews: PreviewProvider {

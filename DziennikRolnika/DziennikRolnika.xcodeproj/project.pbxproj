@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C20155B62A90FBA9007D4D3A /* cow.png in Resources */ = {isa = PBXBuildFile; fileRef = C20155B52A90FBA9007D4D3A /* cow.png */; };
 		C22A17012A8427510004AEA2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C22A17002A8427510004AEA2 /* Assets.xcassets */; };
 		C22A17D22A8A07E60004AEA2 /* 389.png in Resources */ = {isa = PBXBuildFile; fileRef = C22A17C92A8A07E60004AEA2 /* 389.png */; };
 		C22A17D32A8A07E60004AEA2 /* 116.png in Resources */ = {isa = PBXBuildFile; fileRef = C22A17CA2A8A07E60004AEA2 /* 116.png */; };
@@ -41,6 +42,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		C20155B52A90FBA9007D4D3A /* cow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cow.png; path = DziennikRolnika/cow.png; sourceTree = SOURCE_ROOT; };
 		C22A17002A8427510004AEA2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C22A17C92A8A07E60004AEA2 /* 389.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 389.png; sourceTree = "<group>"; };
 		C22A17CA2A8A07E60004AEA2 /* 116.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 116.png; sourceTree = "<group>"; };
@@ -150,6 +152,7 @@
 				C27A8F792A785F5100F1FD3F /* WeatherService.swift */,
 				C27A8F7D2A7E777600F1FD3F /* SpecialDays.swift */,
 				C22A17002A8427510004AEA2 /* Assets.xcassets */,
+				C20155B52A90FBA9007D4D3A /* cow.png */,
 				C22A17E52A8A4C210004AEA2 /* tractors */,
 				C22A17C82A8A07E60004AEA2 /* icons */,
 			);
@@ -236,6 +239,7 @@
 				C22A17D82A8A07E60004AEA2 /* 308.png in Resources */,
 				C22A17FD2A8A4C220004AEA2 /* 40.jpg in Resources */,
 				C22A17012A8427510004AEA2 /* Assets.xcassets in Resources */,
+				C20155B62A90FBA9007D4D3A /* cow.png in Resources */,
 				C22A17D92A8A07E60004AEA2 /* 119.png in Resources */,
 				C22A17F82A8A4C220004AEA2 /* 29.jpg in Resources */,
 				C22A17D52A8A07E60004AEA2 /* 113.png in Resources */,
