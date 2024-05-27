@@ -1,8 +1,4 @@
-//  Fields.swift
-//  DziennikRolnika
-//
-//  Created by Paulina Guzior on 31/07/2023.
-//
+
 
 import SwiftUI
 import MapKit
@@ -151,12 +147,27 @@ class FieldViewModel: ObservableObject {
                 "latitude": field.location.latitude,
                 "longitude": field.location.longitude,
                 "category": field.category,
-                "history": field.history
+                "history": field.history,
+                "spanLatitudeDelta": field.span.latitudeDelta,
+                "spanLongitudeDelta": field.span.longitudeDelta,
+                "drawnPath": encodeDrawnPath(field.drawnPath)
             ]
             serializedFields.append(serializedField)
         }
         
         UserDefaults.standard.set(serializedFields, forKey: fieldsKey)
+    }
+    
+    private func encodeDrawnPath(_ drawnPath: [CGPoint]) -> [[String: CGFloat]] {
+        return drawnPath.map { point in
+            return ["x": point.x, "y": point.y]
+        }
+    }
+    
+    private func decodeDrawnPath(_ drawnPathData: [[String: CGFloat]]) -> [CGPoint] {
+        return drawnPathData.map { dict in
+            return CGPoint(x: dict["x"] ?? 0, y: dict["y"] ?? 0)
+        }
     }
 
     private func loadFields() {
@@ -168,11 +179,17 @@ class FieldViewModel: ObservableObject {
                    let latitude = serializedField["latitude"] as? CLLocationDegrees,
                    let longitude = serializedField["longitude"] as? CLLocationDegrees,
                    let category = serializedField["category"] as? String,
-                   let history = serializedField["history"] as? String {
+                   let history = serializedField["history"] as? String,
+                   let spanLatitudeDelta = serializedField["spanLatitudeDelta"] as? CLLocationDegrees,
+                   let spanLongitudeDelta = serializedField["spanLongitudeDelta"] as? CLLocationDegrees,
+                   let drawnPathData = serializedField["drawnPath"] as? [[String: CGFloat]]
+                {
                     
                     let fieldID = UUID(uuidString: fieldIDString) ?? UUID()
                     let location = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                    let loadedField = Field(location: location, category: category, history: history)
+                    let span = MKCoordinateSpan(latitudeDelta: spanLatitudeDelta, longitudeDelta: spanLongitudeDelta)
+                    let drawnPath = decodeDrawnPath(drawnPathData)
+                    let loadedField = Field(location: location, span: span, category: category, history: history, drawnPath: drawnPath)
                     loadedFields.append(loadedField)
                 }
             }
@@ -235,11 +252,48 @@ struct FieldDetailsView: View {
             TextEditor(text: .constant(field.history))
                 .disabled(true)
                 .padding()
+            
+            DrawnPathView(field: field)
         }
         .padding()
     }
 }
 
+struct DrawnPathView: View {
+    var field: Field
+
+    var body: some View {
+        ZStack {
+            Map(coordinateRegion: regionForLocation(field: field), showsUserLocation: false)
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 400, height: 400)
+                .disabled(true)
+                .overlay(
+                    GeometryReader { geometry in
+                        Path { path in
+                            if !field.drawnPath.isEmpty {
+                                let start = field.drawnPath[0]
+                                path.move(to: start)
+
+                                for point in field.drawnPath.dropFirst() {
+                                    path.addLine(to: point)
+                                }
+                            }
+                        }
+                        .stroke(Color.red, lineWidth: 5)
+                    }
+                )
+                
+        }
+    }
+
+    private func regionForLocation(field: Field) -> Binding<MKCoordinateRegion> {
+        return Binding(
+            get: {         MKCoordinateRegion(center: field.location, span: field.span) },
+            set: { _ in }
+        )
+    }
+}
 
 struct CategoryFilterSheet: View {
     @Environment(\.presentationMode) var presentationMode
@@ -251,7 +305,7 @@ struct CategoryFilterSheet: View {
     
     var body: some View {
         VStack {
-            List(Array(allCategories), id: \.self) { category in
+            List(Array(allCategories).sorted(), id: \.self) { category in
                 Button(action: {
                     toggleCategory(category)
                 }) {
@@ -283,8 +337,14 @@ struct CategoryFilterSheet: View {
 struct Field: Identifiable {
     let id = UUID()
     var location: CLLocationCoordinate2D
+    var span: MKCoordinateSpan
     var category: String
     var history: String
+    var drawnPath: [CGPoint] = []
+
+    mutating func addPointToPath(_ point: CGPoint) {
+        drawnPath.append(point)
+    }
 }
 
 struct AddFieldView: View {
@@ -295,8 +355,15 @@ struct AddFieldView: View {
     )
     
     @State private var category: String = ""
+    @State private var oneyearago: String = ""
+    @State private var twoyearago: String = ""
+    @State private var threeyearago: String = ""
+    @State private var different: String = ""
     @State private var history: String = ""
     @Binding var allCategories: Set<String>
+    
+    @State private var drawnPoints: [CGPoint] = []
+    @State private var isDrawingMode = false
     
     var onAddField: (Field) -> Void
     
@@ -307,12 +374,37 @@ struct AddFieldView: View {
     var body: some View {
         VStack {
             Map(coordinateRegion: $mapRegion, showsUserLocation: true)
-                .frame(height: 400)
+                .gesture(
+                    isDrawingMode ?
+                        DragGesture(minimumDistance: 0, coordinateSpace: .local)
+                            .onChanged { value in
+                                let location = value.location
+                                if CGRect(origin: .zero, size: UIScreen.main.bounds.size).contains(location) {
+                                    drawnPoints.append(location)
+                                }
+                            }
+                        : nil
+                )
+                .overlay(
+                    GeometryReader { geometry in
+                        Path { path in
+                            if isDrawingMode, !drawnPoints.isEmpty {
+                                let start = drawnPoints[0]
+                                path.move(to: start)
+
+                                for point in drawnPoints.dropFirst() {
+                                    path.addLine(to: point)
+                                }
+                            }
+                        }
+                        .stroke(Color.red, lineWidth: 5)
+                    }
+                )
                 .overlay(
                     GeometryReader { geometry in
                         Circle()
                             .fill(Color.red)
-                            .frame(width: 20, height: 20)
+                            .frame(width: 5, height: 5)
                             .opacity(0.8)
                             .position(
                                 x: geometry.size.width / 2,
@@ -320,21 +412,52 @@ struct AddFieldView: View {
                             )
                     }
                 )
-            
-            TextField("Kategoria", text: $category)
+                .frame(width: 400, height: 400)
+
+            Toggle("Tryb rysowania", isOn: $isDrawingMode)
                 .padding()
-            
-            TextEditor(text: $history)
-                .frame(height: 100)
-                .padding()
-                .overlay(RoundedRectangle(cornerRadius: 0).stroke(Color.gray, lineWidth: 1))
+
+            VStack(spacing: -4){
+                TextField("Kategoria", text: $category)
+                    .padding()
+                
+                TextField("Rok temu: ", text: $oneyearago)
+                    .padding()
+                
+                TextField("Dwa lata temu: ", text: $twoyearago)
+                    .padding()
+                
+                TextField("Trzy lata temu: ", text: $threeyearago)
+                    .padding()
+                
+                TextField("Inne: ", text: $different)
+                    .padding()
+            }
             
             Button("Dodaj pole") {
                 if !allCategories.contains(category) {
                     allCategories.insert(category)
                 }
+
+                let centerCoordinate = mapRegion.center
+                let spanLoc = mapRegion.span
+                var combinedHistory = ""
+
+                if !oneyearago.isEmpty {
+                    combinedHistory += "Rok temu: \(oneyearago)\n"
+                }
+                if !twoyearago.isEmpty {
+                    combinedHistory += "Dwa lata temu: \(twoyearago)\n"
+                }
+                if !threeyearago.isEmpty {
+                    combinedHistory += "Trzy lata temu: \(threeyearago)\n"
+                }
+                if !different.isEmpty {
+                    combinedHistory += "Inne: \(different)\n"
+                }
+                                
+                let newField = Field(location: centerCoordinate, span: spanLoc, category: category, history: combinedHistory, drawnPath: drawnPoints)
                 
-                let newField = Field(location: centerCoordinate, category: category, history: history)
                 onAddField(newField)
                 presentationMode.wrappedValue.dismiss()
             }
@@ -344,9 +467,23 @@ struct AddFieldView: View {
             .cornerRadius(10)
         }
     }
+
+    private func convertToMapCoordinates(_ point: CGPoint, in size: CGSize) -> CGPoint {
+            let mapWidth = size.width
+            let mapHeight = size.height
+            
+            let xPos = point.x / mapWidth
+            let yPos = point.y / mapHeight
+            
+            let longitudeDelta = mapRegion.span.longitudeDelta
+            let latitudeDelta = mapRegion.span.latitudeDelta
+            
+            let newLongitude = mapRegion.center.longitude + (xPos - 0.5) * longitudeDelta
+            let newLatitude = mapRegion.center.latitude - (yPos - 0.5) * latitudeDelta
+            
+            return CGPoint(x: newLongitude, y: newLatitude)
+        }
 }
-
-
 
 struct Fields_Previews: PreviewProvider {
     static var previews: some View {

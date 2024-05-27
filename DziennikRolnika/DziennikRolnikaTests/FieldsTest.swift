@@ -1,9 +1,4 @@
-//
-//  FieldsTest.swift
-//  DziennikRolnikaTests
-//
-//  Created by Paulina Guzior on 19/08/2023.
-//
+
 
 import XCTest
 import SwiftUI
@@ -15,8 +10,8 @@ class FieldsTests: XCTestCase {
     func testFilteredFieldsWithoutFilters() {
         let viewModel = FieldViewModel()
         let fields: [Field] = [
-            Field(location: CLLocationCoordinate2D(latitude: 52.4064, longitude: 16.9252), category: "Category1", history: "History1"),
-            Field(location: CLLocationCoordinate2D(latitude: 53.5500, longitude: 9.9937), category: "Category2", history: "History2")
+            Field(location: CLLocationCoordinate2D(latitude: 52.4064, longitude: 16.9252), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05), category: "Category1", history: "History1"),
+            Field(location: CLLocationCoordinate2D(latitude: 53.5500, longitude: 9.9937), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05), category: "Category2", history: "History2")
         ]
         viewModel.fields = fields
         
@@ -40,10 +35,10 @@ class FieldsTests: XCTestCase {
     func testFieldViewModelAddField() {
         let viewModel = FieldViewModel()
         let initialcount = viewModel.fields.count
-        let field = Field(location: CLLocationCoordinate2D(latitude: 52.4064, longitude: 16.9252), category: "Category1", history: "History1")
+        let field = Field(location: CLLocationCoordinate2D(latitude: 52.4064, longitude: 16.9252), span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05), category: "Category1", history: "History1")
         
         viewModel.addField(field)
         
-        XCTAssertEqual(viewModel.fields.count, initialcount+1)
+        XCTAssertEqual(viewModel.fields.count, initialcount + 1)
     }
 }

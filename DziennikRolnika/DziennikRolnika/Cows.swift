@@ -1,9 +1,3 @@
-//
-//  Cows.swift
-//  DziennikRolnika
-//
-//  Created by Paulina Guzior on 31/07/2023.
-//
 
 import SwiftUI
 
@@ -422,6 +416,29 @@ struct NumericTextField: View {
     }
 }
 
+struct EventNotesView: View {
+    @Binding var isPresented: Bool
+    @Binding var notes: String // Use the notes directly
+
+    var body: some View {
+        NavigationView {
+            VStack {
+                TextEditor(text: $notes) // Use notes directly
+                    .padding()
+                Spacer()
+            }
+            .navigationTitle("Custom Notes")
+            .navigationBarItems(
+                trailing:
+                    Button("Save") {
+                        // Save the custom notes to the appropriate data structure or UserDefaults
+                        isPresented = false
+                    }
+            )
+        }
+    }
+}
+
 struct CowDetail: View {
     let cow: Cow
     let cowManager: CowManager
@@ -429,6 +446,7 @@ struct CowDetail: View {
     @State private var newEventDate = Date()
     @State private var selectedEventType: EventType = .calving
     @State private var eventNotes = ""
+    @State private var isEventNotesViewPresented = false
 
     var body: some View {
         VStack {
@@ -450,36 +468,37 @@ struct CowDetail: View {
                     .font(.title)
                     .foregroundColor(.black)
             }
-            HStack(spacing:50){
-                VStack{
-                    Text("Data urodzenia:")
-                        .font(.footnote)
-                        .padding(.horizontal)
-                        .scaledToFit()
-                    Text(formattedDate(date:cow.birthDate))
-                        .font(.footnote)
-                        .padding(.horizontal)
-                        .scaledToFit()
-                    Text("Rasa: \(cow.breed)")
-                        .font(.footnote)
-                        .padding(.horizontal)
-                        .scaledToFit()
-                    Text("Laktacja: \(cow.lactation)")
-                        .font(.footnote)
-                        .padding(.horizontal)
-                        .scaledToFit()
-                }
-                if let imageData = cow.image, let uiImage = UIImage(data: imageData) {
-                    Image(uiImage: uiImage)
-                        .resizable()
-                        .frame(width: 150, height: 150)
-                } else {
-                    Image("cow")
-                        .resizable()
-                        .frame(width: 150, height: 150)
+            GeometryReader { geometry in
+                HStack(spacing:50){
+                    VStack{
+                        Text("Data urodzenia:")
+                            .font(.footnote)
+                            .padding(.horizontal)
+                            .scaledToFit()
+                        Text(formattedDate(date:cow.birthDate))
+                            .font(.footnote)
+                            .padding(.horizontal)
+                            .scaledToFit()
+                        Text("Rasa: \(cow.breed)")
+                            .font(.footnote)
+                            .padding(.horizontal)
+                            .scaledToFit()
+                        Text("Laktacja: \(cow.lactation)")
+                            .font(.footnote)
+                            .padding(.horizontal)
+                            .scaledToFit()
+                    }
+                    if let imageData = cow.image, let uiImage = UIImage(data: imageData) {
+                        Image(uiImage: uiImage)
+                            .resizable()
+                            .frame(width: 150, height: 150)
+                    } else {
+                        Image("cow")
+                            .resizable()
+                            .frame(width: 150, height: 150)
+                    }
                 }
             }
-            
             List(cow.events) { event in
                 VStack(alignment: .leading) {
                     Text(event.type.rawValue)
@@ -501,19 +520,27 @@ struct CowDetail: View {
             }
             .pickerStyle(MenuPickerStyle()) // Ustawienie stylu pickera
             .padding(.horizontal)
-
             
-            TextField("Notatki", text: $eventNotes)
-                .padding(.horizontal)
+            HStack{
+                Button(action: {
+                    isEventNotesViewPresented.toggle()
+                }) {
+                    Text("Add/Edit Notes")
+                        .foregroundColor(.blue)
+                }
+                .sheet(isPresented: $isEventNotesViewPresented) {
+                    EventNotesView(isPresented: $isEventNotesViewPresented, notes: $eventNotes)
+                }
 
-            Button("Dodaj wydarzenie") {
-                let newEvent = Event(type: selectedEventType, date: newEventDate, notes: eventNotes)
-                cowManager.addEvent(to: cow.id, event: newEvent)
-                newEventDate = Date()
-                selectedEventType = .calving
-                eventNotes = ""
+                Button("Dodaj wydarzenie") {
+                    let newEvent = Event(type: selectedEventType, date: newEventDate, notes: eventNotes)
+                    cowManager.addEvent(to: cow.id, event: newEvent)
+                    newEventDate = Date()
+                    selectedEventType = .calving
+                    eventNotes = ""
+                }
+                .padding(.horizontal)
             }
-            .padding(.horizontal)
             
             Button("Usuń krowę") {
                 cowManager.removeCow(id: cow.id)

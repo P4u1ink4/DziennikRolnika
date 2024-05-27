@@ -1,9 +1,3 @@
-//
-//  ContentView.swift
-//  DziennikRolnika
-//
-//  Created by Paulina Guzior on 31/07/2023.
-//
 
 import SwiftUI
 
@@ -155,7 +149,9 @@ class TaskViewModel: ObservableObject {
     }
 
     func addTask(title: String) {
-        tasks.append(title)
+        if(!title.isEmpty){
+            tasks.append(title)
+        }
         saveTasks()
     }
 

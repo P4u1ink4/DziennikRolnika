@@ -1,9 +1,3 @@
-//
-//  SpecialDays.swift
-//  DziennikRolnika
-//
-//  Created by Paulina Guzior on 05/08/2023.
-//
 
 import Foundation
 import SwiftUI

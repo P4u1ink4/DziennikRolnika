@@ -1,9 +1,3 @@
-//
-//  DziennikRolnikaTests.swift
-//  DziennikRolnikaTests
-//
-//  Created by Paulina Guzior on 19/08/2023.
-//
 
 import XCTest
 
